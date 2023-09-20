@@ -37,26 +37,23 @@ class Player:
         return self.is_king_taken
 
 
-class Game:
-    @staticmethod
-    def play():
-        chessboard = Chessboard()
-        player1 = Player('Player1', 'white')
-        player2 = Player('Player2', 'black')
+def play():
+    chessboard = Chessboard()
+    player1 = Player('Player1', 'white')
+    player2 = Player('Player2', 'black')
 
-        while True:
-            is_mate = player1.move(chessboard)
-            if is_mate:
-                break
-            is_mate = player2.move(chessboard)
-            if is_mate:
-                break
+    while True:
+        is_mate = player1.move(chessboard)
+        if is_mate:
+            break
+        is_mate = player2.move(chessboard)
+        if is_mate:
+            break
 
-        winner = player1 if player1.is_king_taken else player2
+    winner = player1 if player1.is_king_taken else player2
 
-        print(f'Winner {winner.get_name()} ({winner.get_color()})')
+    print(f'Winner {winner.get_name()} ({winner.get_color()})')
 
 
 if __name__ == '__main__':
-    Game.play()
-
+    play()
