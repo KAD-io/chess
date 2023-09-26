@@ -108,17 +108,17 @@ class Chessboard:
         print(FINAL_LINE)
 
     @staticmethod
-    def render_square_first_str(chessman, square_color: str) -> str:
-        return f"{chessman.get_name():{square_color}^8}" if chessman else f"{'':{square_color}^8}"
+    def render_square_first_str(chessman: Chessman, square_color: str) -> str:
+        return f"{chessman.name:{square_color}^8}" if chessman else f"{'':{square_color}^8}"
 
     @staticmethod
-    def render_square_second_str(chessman, square_color: str) -> str:
-        return f"{chessman.get_color():{square_color}^8}" if chessman else f"{'':{square_color}^8}"
+    def render_square_second_str(chessman: Chessman, square_color: str) -> str:
+        return f"{chessman.color:{square_color}^8}" if chessman else f"{'':{square_color}^8}"
 
     def move_player(self, coord1: str, coord2: str) -> bool:
         is_king_taken = False
         if self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)]:
-            if self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)].get_name() == 'King':
+            if self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)].name == 'King':
                 is_king_taken = True
 
         self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = None
@@ -145,13 +145,13 @@ class Chessboard:
             return False
 
         #  стоит ли на клетке_А фигура цвета игрока
-        is_valid_color = status_squar1.get_color() == color_player
+        is_valid_color = status_squar1.color == color_player
         if not is_valid_color:
             return False
 
         #  не стоит ли на клетке_Б фигура того же цвета что на клетке_А
         if status_squar2:
-            if status_squar1.get_color() == status_squar2.get_color():
+            if status_squar1.color == status_squar2.color:
                 return False
 
         #  может ли фигура с А попасть на Б в принцепе (через метод фигуры)
@@ -161,7 +161,7 @@ class Chessboard:
 
         # нет ли фигур на промежутке пути А-Б ( доска возвращает list клеток для проверки)
         # исключение проверки пути для коня
-        if status_squar1.get_name() == 'Knight':
+        if status_squar1.name == 'Knight':
             return True
         trek_move = self.get_trek_move(coord1, coord2)
         for square in trek_move:
