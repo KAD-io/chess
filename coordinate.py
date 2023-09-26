@@ -18,12 +18,6 @@ class Coordinate:
         return coord_axis.find(coord)
 
     @staticmethod
-    def get_x(coord: str): return coord[0]
-
-    @staticmethod
-    def get_y(coord: str): return coord[1]
-
-    @staticmethod
     def is_valid_move(coord1: str, coord2: str) -> bool:
         if Coordinate.is_coord(coord1) and Coordinate.is_coord(coord2):
             return True if coord1 != coord2 else False

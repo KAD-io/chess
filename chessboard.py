@@ -50,11 +50,11 @@ class Chessboard:
 
         if len(trek_x_axis) == 0 and len(trek_y_axis) != 0:
             for coord_y in trek_y_axis:
-                trek.append(Coordinate.get_x(coord1) + coord_y)
+                trek.append(Coordinate.x(coord1) + coord_y)
 
         if len(trek_x_axis) != 0 and len(trek_y_axis) == 0:
             for coord_x in trek_x_axis:
-                trek.append(coord_x + Coordinate.get_y(coord1))
+                trek.append(coord_x + Coordinate.y(coord1))
 
         if len(trek_x_axis) != 0 and len(trek_y_axis) != 0:
             for index in range(len(trek_x_axis)):
@@ -155,7 +155,7 @@ class Chessboard:
                 return False
 
         #  может ли фигура с А попасть на Б в принцепе (через метод фигуры)
-        is_move_chessman = status_squar1.is_move(coord1, coord2)
+        is_move_chessman = status_squar1.can_move(coord1, coord2)
         if not is_move_chessman:
             return False
 
