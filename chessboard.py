@@ -140,7 +140,7 @@ class Chessboard:
 
         #   не пусто ли на клетке_А
         status_squar1 = self.get_status_square(coord1)
-        status_squar2 = self.get_status_square(coord2)
+        #status_squar2 = self.get_status_square(coord2)
         if not status_squar1:
             return False
 
@@ -150,12 +150,12 @@ class Chessboard:
             return False
 
         #  не стоит ли на клетке_Б фигура того же цвета что на клетке_А
-        if status_squar2:
-            if status_squar1.color == status_squar2.color:
-                return False
+        # if status_squar2:
+        #     if status_squar1.color == status_squar2.color:
+        #         return False
 
         #  может ли фигура с А попасть на Б в принцепе (через метод фигуры)
-        is_move_chessman = status_squar1.can_move(coord1, coord2)
+        is_move_chessman = status_squar1.can_move(coord1, coord2, self.get_status_square(coord2))
         if not is_move_chessman:
             return False
 
