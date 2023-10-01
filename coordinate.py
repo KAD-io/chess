@@ -52,6 +52,6 @@ class Coordinate:
         return Coordinate.dif_coord_y(coord1, coord2) == 0
 
     @staticmethod
-    def is_move_diogonal(coord1: str, coord2: str) -> bool:
+    def is_move_diagonal(coord1: str, coord2: str) -> bool:
         return Coordinate.dif_coord_x(coord1, coord2) == Coordinate.dif_coord_y(coord1, coord2)
 

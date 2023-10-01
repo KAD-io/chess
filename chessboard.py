@@ -128,40 +128,37 @@ class Chessboard:
 
         self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)] = None
 
+        self.get_status_square(coord2).count_move += 1
+
+        if self.can_promotion_pawn(coord2):
+            self.promotion_pawn(coord2, self.get_status_square(coord2).color)
+
         return is_king_taken
 
     def is_valid_move_player(self, color_player: str, coord1: str, coord2: str) -> bool:
 
         #  не выходятли координаты за пределы доски
         #  клетка_А != клетка_Б
-        is_valid_coord = Coordinate.is_valid_move(coord1, coord2)
-        if not is_valid_coord:
+        if not Coordinate.is_valid_move(coord1, coord2):
             return False
 
         #   не пусто ли на клетке_А
-        status_squar1 = self.get_status_square(coord1)
-        #status_squar2 = self.get_status_square(coord2)
-        if not status_squar1:
+        chessman_on_coord1 = self.get_status_square(coord1)
+        if not chessman_on_coord1:
             return False
 
         #  стоит ли на клетке_А фигура цвета игрока
-        is_valid_color = status_squar1.color == color_player
-        if not is_valid_color:
+        if not chessman_on_coord1.color == color_player:
             return False
 
-        #  не стоит ли на клетке_Б фигура того же цвета что на клетке_А
-        # if status_squar2:
-        #     if status_squar1.color == status_squar2.color:
-        #         return False
-
         #  может ли фигура с А попасть на Б в принцепе (через метод фигуры)
-        is_move_chessman = status_squar1.can_move(coord1, coord2, self.get_status_square(coord2))
+        is_move_chessman = chessman_on_coord1.can_move(coord1, coord2, self.get_status_square(coord2))
         if not is_move_chessman:
             return False
 
         # нет ли фигур на промежутке пути А-Б ( доска возвращает list клеток для проверки)
         # исключение проверки пути для коня
-        if status_squar1.name == 'Knight':
+        if chessman_on_coord1.name == 'Knight':
             return True
         trek_move = self.get_trek_move(coord1, coord2)
         for square in trek_move:
@@ -169,6 +166,46 @@ class Chessboard:
                 return False
 
         return True
+
+    def can_promotion_pawn(self, coord: str) -> bool:
+        if self.get_status_square(coord).name != 'Pawn':
+            return False
+        return Coordinate.y(coord) == '1' or Coordinate.y(coord) == '8'
+
+    def promotion_pawn(self, coord, color):
+        CHESSMANS_FOR_PROMOTION = {'q': Queen, 'r': Rook, 'b': Bishop, 'k': Knight}
+        valid_chessman = False
+        while not valid_chessman:
+            print('Your pawn is moved to its last rank!')
+            print('q - Queen, r - Rook, b - Bishop, k - Knight')
+            input_chessman = input('Enter one of the symbols to promotion the pawn: ').lower()
+
+            valid_chessman = self.is_valid_chessman(input_chessman)
+            if not valid_chessman:
+                print("invalid input of chessman")
+                continue
+            count_move = self.get_status_square(coord).count_move
+            self.squares[Coordinate.x(coord)][Coordinate.y(coord)] = CHESSMANS_FOR_PROMOTION[input_chessman](color)
+            self.get_status_square(coord).count_move = count_move
+
+    @staticmethod
+    def is_valid_chessman(input_chessman):
+        VALID_VALUE = 'qrbk'
+        if len(input_chessman) != 1:
+            return False
+        return True if VALID_VALUE.find(input_chessman) != -1 else False
+
+    # TODO: реализовать проверку на "шах" (до и после хода)
+    @staticmethod
+    def is_check() -> bool:
+        pass
+
+    # TODO: реализовать рокировку
+    def castling(self):
+        pass
+
+
+
 
 
 

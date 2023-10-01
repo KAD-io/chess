@@ -3,6 +3,7 @@ from coordinate import Coordinate
 
 class Chessman:
     name = ''
+    count_move = 0
 
     def __init__(self, color):
         self.color = color
@@ -36,7 +37,7 @@ class Queen(Chessman):
             return False
         return (Coordinate.is_move_horizontal(coord_a, coord_b) or
                 Coordinate.is_move_vertical(coord_a, coord_b) or
-                Coordinate.is_move_diogonal(coord_a, coord_b))
+                Coordinate.is_move_diagonal(coord_a, coord_b))
 
 
 class Rook(Chessman):
@@ -57,7 +58,7 @@ class Bishop(Chessman):
     def can_move(self, coord_a, coord_b, chessman_on_coord_b):
         if self.is_same_color(chessman_on_coord_b):
             return False
-        return Coordinate.is_move_diogonal(coord_a, coord_b)
+        return Coordinate.is_move_diagonal(coord_a, coord_b)
 
 
 class Knight(Chessman):
@@ -75,6 +76,7 @@ class Pawn(Chessman):
     """"Пешка"""
     name = 'Pawn'
 
+    # TODO: реализовать "взятие на проходе"
     def can_move(self, coord_a, coord_b, chessman_on_coord_b):
         # ход
         if Coordinate.is_move_vertical(coord_a, coord_b):
@@ -93,7 +95,7 @@ class Pawn(Chessman):
                 else:
                     return Coordinate.dif_dir_coord_y(coord_a, coord_b) == -1
         # атака
-        if Coordinate.is_move_diogonal(coord_a, coord_b):
+        if Coordinate.is_move_diagonal(coord_a, coord_b):
             if not chessman_on_coord_b:
                 return False
             if chessman_on_coord_b.color == self.color:
