@@ -30,8 +30,10 @@ class Player:
                 continue
             coord1 = input_coord1
             coord2 = input_coord2
-
-        opponent_player.check = chessboard.move_player(coord1, coord2)
+        if is_valid_move_player == 'castling':
+            chessboard.castling(coord1, coord2)
+        else:
+            opponent_player.check = chessboard.move_player(coord1, coord2)
 
         return mate
 

@@ -1,11 +1,8 @@
-import copy
-
 from chessman import Chessman, Rook, Knight, Bishop, Queen, King, Pawn
 from coordinate import Coordinate
 
 
 class Chessboard:
-
     squares = {}
     coord_kings = {'white': 'e1', 'black': 'e8'}
     chess_pieces = {'white': [], 'black': []}
@@ -51,19 +48,19 @@ class Chessboard:
         for y in Coordinate.Y_AXIS[::-1]:
             first_str = str(y) + ' ║'
             second_str = '  ║'
-            for x in Coordinate.X_AXIS:       # чет начинается с белой
-                if int(y) % 2:                      # у-неч.
-                    if Coordinate.ind_x(x) % 2:     # х-чет.
+            for x in Coordinate.X_AXIS:  # чет начинается с белой
+                if int(y) % 2:  # у-неч.
+                    if Coordinate.ind_x(x) % 2:  # х-чет.
                         first_str += Chessboard.render_square_first_str(self.squares[x][y], '█')
                         second_str += Chessboard.render_square_second_str(self.squares[x][y], '█')
-                    else:                           # х-неч.
+                    else:  # х-неч.
                         first_str += Chessboard.render_square_first_str(self.squares[x][y], ' ')
                         second_str += Chessboard.render_square_second_str(self.squares[x][y], ' ')
-                else:                               # у-чет.
-                    if Coordinate.ind_x(x) % 2:     # х-чет.
+                else:  # у-чет.
+                    if Coordinate.ind_x(x) % 2:  # х-чет.
                         first_str += Chessboard.render_square_first_str(self.squares[x][y], ' ')
                         second_str += Chessboard.render_square_second_str(self.squares[x][y], ' ')
-                    else:                           # х-нетч.
+                    else:  # х-нетч.
                         first_str += Chessboard.render_square_first_str(self.squares[x][y], '█')
                         second_str += Chessboard.render_square_second_str(self.squares[x][y], '█')
             first_str += '║ ' + str(y)
@@ -145,7 +142,7 @@ class Chessboard:
         # пересчет допустимого диапазона ходов для всех фигур
         self.set_available_coordinates_for_chess_pieces()
 
-    def is_valid_move_player(self, color_player: str, coord1: str, coord2: str) -> bool:
+    def is_valid_move_player(self, color_player: str, coord1: str, coord2: str):
 
         #  не выходятли координаты за пределы доски
         #  клетка_А != клетка_Б
@@ -164,8 +161,11 @@ class Chessboard:
             print(f'the chessman on {coord1} is not your color')
             return False
 
+        if self.is_castling(coord1, coord2):
+            return 'castling'
+
         #  может ли фигура с А попасть на Б в принцепе
-        if not coord2 in chessman_on_coord1.available_coordinates:
+        if coord2 not in chessman_on_coord1.available_coordinates:
             print(f'the square on {coord2} is not available for the {chessman_on_coord1.name} on {coord1}')
             return False
 
@@ -211,7 +211,6 @@ class Chessboard:
             self.squares[Coordinate.x(coord)][Coordinate.y(coord)] = FIGURES_FOR_PROMOTION[input_chessman](color, coord)
             self.get_status_square(coord).count_move = count_move
 
-    # TODO: реализовать проверку на "шах" (до и после хода)
     @staticmethod
     def invert_color(color_player: str) -> str:
         return 'white' if color_player == 'black' else 'black'
@@ -230,9 +229,60 @@ class Chessboard:
                     return False
         return True
 
-    # TODO: реализовать рокировку
-    def castling(self):
-        pass
+    def is_castling(self, coord1: str, coord2: str) -> bool:
+        trek = Coordinate.get_trek_move(coord1, coord2)
+        for square in trek:
+            if self.get_status_square(square):
+                return False
+
+        chessman_on_coord1 = self.get_status_square(coord1)
+        chessman_on_coord2 = self.get_status_square(coord2)
+
+        if len(trek) == 2 or len(trek) == 3:
+            for square in [chessman_on_coord1.coordinate, trek[0], trek[1]]:
+                for chessman in self.chess_pieces[self.invert_color(chessman_on_coord1.color)]:
+                    if square in chessman.available_coordinates:
+                        return False
+        else:
+            return False
+
+        if chessman_on_coord1.name == 'King' and \
+                chessman_on_coord2.name == 'Rook' and \
+                chessman_on_coord1.color == chessman_on_coord2.color and \
+                chessman_on_coord1.count_move == 0 and \
+                chessman_on_coord2.count_move == 0:
+            return True
+
+        return False
+
+    def castling(self, coord1: str, coord2: str):
+
+        coord_y = Coordinate.y(coord1)
+        if Coordinate.x(coord2) == 'a':
+            coord_king = 'c' + coord_y
+            coord_rook = 'd' + coord_y
+        else:
+            coord_king = 'g' + coord_y
+            coord_rook = 'f' + coord_y
+
+        self.move_castling(coord1, coord_king)
+        self.move_castling(coord2, coord_rook)
+
+        # пересчет допустимого диапазона ходов для всех фигур
+        self.set_available_coordinates_for_chess_pieces()
+
+    def move_castling(self, coord1: str, coord2: str):
+
+        moving_chessman = self.get_status_square(coord1)
+
+        self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = \
+            self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)]
+        self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)] = None
+
+        if moving_chessman.name == 'King':
+            self.coord_kings[moving_chessman.color] = coord2
+        moving_chessman.count_move += 1
+        moving_chessman.coordinate = coord2
 
     def set_available_coordinates_for_chess_pieces(self):
 
