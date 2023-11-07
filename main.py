@@ -26,7 +26,7 @@ class Player:
             input_coord2 = input('input coordinate 2: ').lower()
             is_valid_move_player = chessboard.is_valid_move_player(self.color, input_coord1, input_coord2)
             if not is_valid_move_player:
-                print("invalid input of coordinates")
+                print('enter coordinates taking into account the warning')
                 continue
             coord1 = input_coord1
             coord2 = input_coord2

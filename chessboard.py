@@ -150,34 +150,41 @@ class Chessboard:
         #  не выходятли координаты за пределы доски
         #  клетка_А != клетка_Б
         if not Coordinate.is_valid_move(coord1, coord2):
+            print('invalid input of coordinates')
             return False
 
         #   не пусто ли на клетке_А
         chessman_on_coord1 = self.get_status_square(coord1)
         if not chessman_on_coord1:
+            print(f'the square on {coord1} is empty')
             return False
 
         #  стоит ли на клетке_А фигура цвета игрока
         if not chessman_on_coord1.color == color_player:
+            print(f'the chessman on {coord1} is not your color')
             return False
 
-        #  может ли фигура с А попасть на Б в принцепе (через метод фигуры)
-        is_move_chessman = chessman_on_coord1.can_move(coord1, coord2, self.get_status_square(coord2))
-        if not is_move_chessman:
+        #  может ли фигура с А попасть на Б в принцепе
+        if not coord2 in chessman_on_coord1.available_coordinates:
+            print(f'the square on {coord2} is not available for the {chessman_on_coord1.name} on {coord1}')
             return False
 
-        # нет ли фигур на промежутке пути А-Б ( доска возвращает list клеток для проверки)
-        # исключение проверки пути для коня
-        if chessman_on_coord1.name == 'Knight':
-            return True
-        trek_move = Coordinate.get_trek_move(coord1, coord2)
-        for square in trek_move:
-            if self.get_status_square(square):
-                return False
+        # is_move_chessman = chessman_on_coord1.can_move(coord1, coord2, self.get_status_square(coord2))
+        # if not is_move_chessman:
+        #     return False
+        #
+        # # нет ли фигур на промежутке пути А-Б ( доска возвращает list клеток для проверки)
+        # # исключение проверки пути для коня
+        # if chessman_on_coord1.name == 'Knight':
+        #     return True
+        # trek_move = Coordinate.get_trek_move(coord1, coord2)
+        # for square in trek_move:
+        #     if self.get_status_square(square):
+        #         return False
 
         # не ставит ли игрок своим ходом "шаг" самому себе
         if self.is_check_in_testing_move(coord1, coord2):
-            print('CHECK!!!')
+            print('you cannot make a move after which your king is placed in check')
             return False
 
         return True
