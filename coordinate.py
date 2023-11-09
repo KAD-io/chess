@@ -139,8 +139,6 @@ class Coordinate:
                     extreme_coords.append(coord)
                 continue
 
-            # dif_x = Coordinate.dif_coord_x(coord_x, Coordinate.x(corner_board))
-            # dif_y = Coordinate.dif_coord_y(coord_y, Coordinate.y(corner_board))
             dif_x = Coordinate.dif_coord_x(coord, corner_board)
             dif_y = Coordinate.dif_coord_y(coord, corner_board)
 

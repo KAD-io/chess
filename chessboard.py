@@ -93,28 +93,53 @@ class Chessboard:
         return check
 
     def is_check_in_testing_move(self, coord1: str, coord2: str) -> bool:
-        status_coord2 = self.get_status_square(coord2)
+        moving_chessman = self.get_status_square(coord1)
+        attacked_chessman = self.get_status_square(coord2)
+        coord_en_passant = None
+
+        if moving_chessman.name == 'Pawn' and not attacked_chessman and \
+                Coordinate.x(coord1) != Coordinate.x(coord2):
+            coord_en_passant = Coordinate.x(coord2) + Coordinate.y(coord1)
+            attacked_chessman = self.get_status_square(coord_en_passant)
 
         self.move(coord1, coord2)
 
         if self.is_check(self.get_status_square(coord2).color):
-            self.reverse_move(coord1, coord2, status_coord2)
+            self.reverse_move(coord1, coord2, attacked_chessman, coord_en_passant)
             return True
-        self.reverse_move(coord1, coord2, status_coord2)
+        self.reverse_move(coord1, coord2, attacked_chessman, coord_en_passant)
         return False
 
     def move(self, coord1: str, coord2: str):
 
         moving_chessman = self.get_status_square(coord1)
-        chessman_on_coord2 = self.get_status_square(coord2)
+        attacked_chessman = self.get_status_square(coord2)
+
+        chess_pieces = []
+        chess_pieces.extend(self.chess_pieces['white'])
+        chess_pieces.extend(self.chess_pieces['black'])
+
+        for chessman in chess_pieces:
+            if chessman.name == 'Pawn':
+                chessman.en_passant = False
+
+        if moving_chessman.name == 'Pawn' and moving_chessman.count_move == 0 and \
+                (Coordinate.y(coord2) == '4' or Coordinate.y(coord2) == '5'):
+            moving_chessman.en_passant = True
+
+        if moving_chessman.name == 'Pawn' and not attacked_chessman and \
+                Coordinate.x(coord1) != Coordinate.x(coord2):
+            coord_en_passant = Coordinate.x(coord2) + Coordinate.y(coord1)
+            attacked_chessman = self.get_status_square(coord_en_passant)
+            self.squares[Coordinate.x(coord_en_passant)][Coordinate.y(coord_en_passant)] = None
 
         self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = \
             self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)]
         self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)] = None
 
-        if chessman_on_coord2:
+        if attacked_chessman:
             # пересчет оставшихся фигур на доске
-            self.chess_pieces[chessman_on_coord2.color].remove(chessman_on_coord2)
+            self.chess_pieces[attacked_chessman.color].remove(attacked_chessman)
 
         if moving_chessman.name == 'King':
             self.coord_kings[moving_chessman.color] = coord2
@@ -124,13 +149,22 @@ class Chessboard:
         # пересчет допустимого диапазона ходов для всех фигур
         self.set_available_coordinates_for_chess_pieces()
 
-    def reverse_move(self, coord1: str, coord2: str, buffer: Chessman):
-
+    def reverse_move(self, coord1: str, coord2: str, buffer: Chessman, coord_en_passant: str):
         moving_chessman = self.get_status_square(coord2)
+
+        if moving_chessman.name == 'Pawn':
+            if moving_chessman.en_passant:
+                moving_chessman.en_passant = False
 
         self.squares[Coordinate.x(coord1)][Coordinate.y(coord1)] = \
             self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)]
-        self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = buffer
+
+        if coord_en_passant:
+            self.squares[Coordinate.x(coord_en_passant)][Coordinate.y(coord_en_passant)] = buffer
+            self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = None
+        else:
+            self.squares[Coordinate.x(coord2)][Coordinate.y(coord2)] = buffer
+
         if buffer:
             self.chess_pieces[buffer.color].append(buffer)
 
@@ -198,6 +232,7 @@ class Chessboard:
         # превращение пешки
         FIGURES_FOR_PROMOTION = {'q': Queen, 'r': Rook, 'b': Bishop, 'k': Knight}
         valid_chessman = False
+        index = self.chess_pieces[color].index(self.get_status_square(coord))
         while not valid_chessman:
             print('Your pawn is moved to its last rank!')
             print('q - Queen, r - Rook, b - Bishop, k - Knight')
@@ -209,6 +244,7 @@ class Chessboard:
                 continue
             count_move = self.get_status_square(coord).count_move
             self.squares[Coordinate.x(coord)][Coordinate.y(coord)] = FIGURES_FOR_PROMOTION[input_chessman](color, coord)
+            self.chess_pieces[color][index] = self.get_status_square(coord)
             self.get_status_square(coord).count_move = count_move
 
     @staticmethod

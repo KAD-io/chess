@@ -161,8 +161,8 @@ class Knight(Chessman):
 class Pawn(Chessman):
     """"Пешка"""
     name = 'Pawn'
+    en_passant = False
 
-    # TODO: реализовать "взятие на проходе"
     def can_move(self, coord_a, coord_b, chessman_on_coord_b):
         # ход
         if Coordinate.is_move_vertical(coord_a, coord_b):
@@ -201,6 +201,7 @@ class Pawn(Chessman):
         ind_y = Coordinate.ind_y(self.coordinate)
 
         coordinates = []
+        coordinates_en_passant = []
 
         if self.color == 'white':
             dif_move = [1]
@@ -230,9 +231,14 @@ class Pawn(Chessman):
             coord = Coordinate.get_coord_by_ind(ind_x + dif_attack_x, ind_y + dif_attack['y'])
             if coord:
                 coordinates.append(coord)
+            coord_en_passant = Coordinate.get_coord_by_ind(ind_x + dif_attack_x, ind_y)
+            if coord_en_passant:
+                coordinates_en_passant.append(coord_en_passant)
 
-        for coord in coordinates:
+        for coord, coord_en_passant in zip(coordinates, coordinates_en_passant):
             if self.is_coordinate_available_for_attack_pawn(coord, chess_pieces):
+                available_coordinates.append(coord)
+            if self.is_coordinate_available_for_en_passant(coord_en_passant, chess_pieces):
                 available_coordinates.append(coord)
         return available_coordinates
 
@@ -254,3 +260,12 @@ class Pawn(Chessman):
             if coordinate == chessman.coordinate:
                 return False
         return True
+
+    def is_coordinate_available_for_en_passant(self, coordinate: str, chess_pieces: list):
+        for chessman in chess_pieces:
+            if chessman == self:
+                continue
+            if coordinate == chessman.coordinate and chessman.name == self.name:
+                if chessman.en_passant:
+                    return True
+        return False
