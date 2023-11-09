@@ -203,19 +203,6 @@ class Chessboard:
             print(f'the square on {coord2} is not available for the {chessman_on_coord1.name} on {coord1}')
             return False
 
-        # is_move_chessman = chessman_on_coord1.can_move(coord1, coord2, self.get_status_square(coord2))
-        # if not is_move_chessman:
-        #     return False
-        #
-        # # нет ли фигур на промежутке пути А-Б ( доска возвращает list клеток для проверки)
-        # # исключение проверки пути для коня
-        # if chessman_on_coord1.name == 'Knight':
-        #     return True
-        # trek_move = Coordinate.get_trek_move(coord1, coord2)
-        # for square in trek_move:
-        #     if self.get_status_square(square):
-        #         return False
-
         # не ставит ли игрок своим ходом "шаг" самому себе
         if self.is_check_in_testing_move(coord1, coord2):
             print('you cannot make a move after which your king is placed in check')

@@ -11,9 +11,6 @@ class Chessman:
         self.color = color
         self.coordinate = coordinate
 
-    def can_move(self, coord_a: str, coord_b: str, chessman_on_coord_b):
-        raise NotImplementedError
-
     def is_same_color(self, another_chessman):
         if not another_chessman:
             return False
@@ -84,13 +81,6 @@ class Queen(Chessman):
     """Королева"""
     name = 'Queen'
 
-    def can_move(self, coord_a, coord_b, chessman_on_coord_b):
-        if self.is_same_color(chessman_on_coord_b):
-            return False
-        return (Coordinate.is_move_horizontal(coord_a, coord_b) or
-                Coordinate.is_move_vertical(coord_a, coord_b) or
-                Coordinate.is_move_diagonal(coord_a, coord_b))
-
     def find_available_coordinates(self, chess_pieces: list):
         extreme_coords = Coordinate.get_extreme_coords_on_straight(self.coordinate)
         extreme_coords.extend(Coordinate.get_extreme_coords_on_diagonal(self.coordinate))
@@ -101,12 +91,6 @@ class Rook(Chessman):
     """Ладья"""
     name = 'Rook'
 
-    def can_move(self, coord_a, coord_b, chessman_on_coord_b):
-        if self.is_same_color(chessman_on_coord_b):
-            return False
-        return (Coordinate.is_move_horizontal(coord_a, coord_b) or
-                Coordinate.is_move_vertical(coord_a, coord_b))
-
     def find_available_coordinates(self, chess_pieces: list):
         extreme_coords = Coordinate.get_extreme_coords_on_straight(self.coordinate)
         return self.get_available_coordinates(extreme_coords, chess_pieces)
@@ -116,11 +100,6 @@ class Bishop(Chessman):
     """"Слон"""
     name = 'Bishop'
 
-    def can_move(self, coord_a, coord_b, chessman_on_coord_b):
-        if self.is_same_color(chessman_on_coord_b):
-            return False
-        return Coordinate.is_move_diagonal(coord_a, coord_b)
-
     def find_available_coordinates(self, chess_pieces: list):
         extreme_coords = Coordinate.get_extreme_coords_on_diagonal(self.coordinate)
         return self.get_available_coordinates(extreme_coords, chess_pieces)
@@ -129,12 +108,6 @@ class Bishop(Chessman):
 class Knight(Chessman):
     """Конь"""
     name = 'Knight'
-
-    def can_move(self, coord_a, coord_b, chessman_on_coord_b):
-        if self.is_same_color(chessman_on_coord_b):
-            return False
-        return ((Coordinate.dif_coord_x(coord_a, coord_b) == 1 and Coordinate.dif_coord_y(coord_a, coord_b) == 2) or
-                (Coordinate.dif_coord_x(coord_a, coord_b) == 2 and Coordinate.dif_coord_y(coord_a, coord_b) == 1))
 
     def find_available_coordinates(self, chess_pieces: list):
         available_coordinates = []
@@ -162,38 +135,6 @@ class Pawn(Chessman):
     """"Пешка"""
     name = 'Pawn'
     en_passant = False
-
-    def can_move(self, coord_a, coord_b, chessman_on_coord_b):
-        # ход
-        if Coordinate.is_move_vertical(coord_a, coord_b):
-            if chessman_on_coord_b:
-                return False
-            if self.color == 'white':
-                if Coordinate.y(coord_a) == '2':
-                    return (Coordinate.dif_dir_coord_y(coord_a, coord_b) == 1 or
-                            Coordinate.dif_dir_coord_y(coord_a, coord_b) == 2)
-                else:
-                    return Coordinate.dif_dir_coord_y(coord_a, coord_b) == 1
-            else:
-                if Coordinate.y(coord_a) == '7':
-                    return (Coordinate.dif_dir_coord_y(coord_a, coord_b) == -1 or
-                            Coordinate.dif_dir_coord_y(coord_a, coord_b) == -2)
-                else:
-                    return Coordinate.dif_dir_coord_y(coord_a, coord_b) == -1
-        # атака
-        if Coordinate.is_move_diagonal(coord_a, coord_b):
-            if not chessman_on_coord_b:
-                return False
-            if chessman_on_coord_b.color == self.color:
-                return False
-            if Coordinate.dif_coord_x(coord_a, coord_b) != 1:
-                return False
-            if self.color == 'white':
-                return Coordinate.dif_dir_coord_y(coord_a, coord_b) == 1
-            else:
-                return Coordinate.dif_dir_coord_y(coord_a, coord_b) == -1
-
-        return False
 
     def find_available_coordinates(self, chess_pieces: list):
         available_coordinates = []

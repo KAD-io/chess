@@ -5,6 +5,7 @@ class Coordinate:
 
     @staticmethod
     def x(coord: str): return coord[0]
+
     @staticmethod
     def y(coord: str): return coord[1]
 
@@ -13,10 +14,6 @@ class Coordinate:
 
     @staticmethod
     def ind_y(coord: str): return Coordinate.Y_AXIS.find(coord[1])
-
-    @staticmethod
-    def ind_axis(coord: str, coord_axis: str):
-        return coord_axis.find(coord)
 
     @staticmethod
     def is_valid_move(coord1: str, coord2: str) -> bool:
@@ -46,22 +43,6 @@ class Coordinate:
     @staticmethod
     def dif_coord_y(coord1: str, coord2: str) -> int:
         return abs(int(Coordinate.y(coord1)) - int(Coordinate.y(coord2)))
-
-    @staticmethod
-    def dif_dir_coord_y(coord1: str, coord2: str) -> int:
-        return int(Coordinate.y(coord2)) - int(Coordinate.y(coord1))
-
-    @staticmethod
-    def is_move_vertical(coord1: str, coord2: str) -> bool:
-        return Coordinate.dif_coord_x(coord1, coord2) == 0
-
-    @staticmethod
-    def is_move_horizontal(coord1: str, coord2: str) -> bool:
-        return Coordinate.dif_coord_y(coord1, coord2) == 0
-
-    @staticmethod
-    def is_move_diagonal(coord1: str, coord2: str) -> bool:
-        return Coordinate.dif_coord_x(coord1, coord2) == Coordinate.dif_coord_y(coord1, coord2)
 
     @staticmethod
     def get_trek_move(first_coord: str, last_coord: str) -> list[str]:
